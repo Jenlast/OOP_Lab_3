@@ -7,32 +7,41 @@
              Background="Transparent">
     
     <Grid Name="GameArea">
+        <!-- СТАТИЧНИЙ ШАР -->
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="20">
+            
             <TextBlock Text="{Binding QuestionText}" FontSize="24" HorizontalAlignment="Center"/>
+            
+            <TextBlock Text="{Binding TimerText}" FontSize="18" Foreground="Gray" 
+                       HorizontalAlignment="Center" MinHeight="25"/>
+            
             <StackPanel Orientation="Horizontal" Spacing="50" HorizontalAlignment="Center">
                 <Button Content="Так" Width="100" Height="40" 
                         HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
                         Command="{Binding SayYesCommand}" />
-                <Panel Width="100" Height="40"/>
+                
+                <!-- МАЯЧОК ДЛЯ КНОПКИ 'НІ' -->
+                <Panel Name="DummyPanel" Width="100" Height="40"/>
             </StackPanel>
         </StackPanel>
 
+        <!-- ДИНАМІЧНИЙ ШАР (Canvas) -->
         <Canvas>
-            <Button Content="Ні" 
+            <Button Content="{Binding MovingButtonText}" 
                     Canvas.Left="{Binding ButtonX}" 
                     Canvas.Top="{Binding ButtonY}" 
                     Width="100" Height="40"
                     HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-                    Background="DarkRed" Foreground="White">
+                    Background="{Binding MovingButtonColor}" 
+                    Foreground="White"
+                    Command="{Binding MovingButtonCommand}">
                 
-                <!-- МАГІЯ АНІМАЦІЇ: Плавно анімує зміну координат X та Y -->
                 <Button.Transitions>
                     <Transitions>
-                        <DoubleTransition Property="Canvas.Left" Duration="0:0:0.1" />
-                        <DoubleTransition Property="Canvas.Top" Duration="0:0:0.1" />
+                        <DoubleTransition Property="Canvas.Left" Duration="0:0:0.15" />
+                        <DoubleTransition Property="Canvas.Top" Duration="0:0:0.15" />
                     </Transitions>
                 </Button.Transitions>
-                
             </Button>
         </Canvas>
     </Grid>
