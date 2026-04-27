@@ -1,0 +1,9 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:OOP_Lab3.ViewModels"
+             x:DataType="vm:Task1ViewModel"
+             x:Class="OOP_Lab3.Views.Task1View">
+    <Grid>
+        <TextBlock Text="{Binding Message}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24"/>
+    </Grid>
+</UserControl>
