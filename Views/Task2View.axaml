@@ -4,35 +4,36 @@
              x:DataType="vm:Task2ViewModel"
              x:Class="OOP_Lab3.Views.Task2View"
              PointerMoved="OnPointerMoved"
-             Background="Transparent"> <!-- Прозорий фон, щоб ловити мишу всюди -->
+             Background="Transparent">
     
     <Grid Name="GameArea">
-        
-        <!-- СТАТИЧНИЙ ШАР (Завжди по центру) -->
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="20">
-            <!-- Питання (його текст ми зможемо змінювати з ViewModel) -->
             <TextBlock Text="{Binding QuestionText}" FontSize="24" HorizontalAlignment="Center"/>
-            
             <StackPanel Orientation="Horizontal" Spacing="50" HorizontalAlignment="Center">
-                <!-- Статична кнопка "Так" -->
                 <Button Content="Так" Width="100" Height="40" 
                         HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
                         Command="{Binding SayYesCommand}" />
-                
-                <!-- Пусте місце (заглушка), де візуально має стояти кнопка "Ні" на початку -->
                 <Panel Width="100" Height="40"/>
             </StackPanel>
         </StackPanel>
 
-        <!-- ДИНАМІЧНИЙ ШАР (Canvas для втікаючої кнопки "Ні") -->
         <Canvas>
             <Button Content="Ні" 
                     Canvas.Left="{Binding ButtonX}" 
                     Canvas.Top="{Binding ButtonY}" 
                     Width="100" Height="40"
                     HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-                    Background="DarkRed" Foreground="White"/>
+                    Background="DarkRed" Foreground="White">
+                
+                <!-- МАГІЯ АНІМАЦІЇ: Плавно анімує зміну координат X та Y -->
+                <Button.Transitions>
+                    <Transitions>
+                        <DoubleTransition Property="Canvas.Left" Duration="0:0:0.1" />
+                        <DoubleTransition Property="Canvas.Top" Duration="0:0:0.1" />
+                    </Transitions>
+                </Button.Transitions>
+                
+            </Button>
         </Canvas>
-        
     </Grid>
-</UserControl>  
+</UserControl>

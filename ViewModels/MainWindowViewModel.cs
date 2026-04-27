@@ -1,4 +1,4 @@
-using OOP_Lab3.Core; // Щоб бачило BasicEvasionStrategy
+using OOP_Lab3.Core;
 
 namespace OOP_Lab3.ViewModels
 {
@@ -21,7 +21,8 @@ namespace OOP_Lab3.ViewModels
         
         public void OpenTask2() 
         {
-            CurrentView = new Task2ViewModel(new BasicEvasionStrategy());
+            // ОСЬ ТУТ: Просто передаємо нову фізичну стратегію!
+            CurrentView = new Task2ViewModel(new PhysicsEvasionStrategy());
         }
     }
 }
