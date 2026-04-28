@@ -1,14 +1,9 @@
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace OOP_Lab3.ViewModels
 {
-    public class ViewModelBase : INotifyPropertyChanged
+    // Тепер ViewModelBase наслідує ObservableObject і передає його всім іншим
+    public class ViewModelBase : ObservableObject
     {
-        public event PropertyChangedEventHandler? PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
     }
 }

@@ -1,9 +1,81 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:OOP_Lab3.ViewModels"
-             x:DataType="vm:Task1ViewModel"
-             x:Class="OOP_Lab3.Views.Task1View">
-    <Grid>
-        <TextBlock Text="{Binding Message}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24"/>
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="OOP_Lab3.Views.Task1View"
+             x:DataType="vm:Task1ViewModel">
+
+    <Grid ColumnDefinitions="300, *">
+        
+        <!-- Ліва панель керування -->
+        <StackPanel Grid.Column="0" Spacing="10" Margin="20">
+            <TextBlock Text="Налаштування генерації" FontWeight="Bold" FontSize="16"/>
+            
+            <TextBlock Text="Початок:" />
+            <NumericUpDown Value="{Binding StartValue}" FormatString="0" />
+            
+            <TextBlock Text="Кінець:" />
+            <NumericUpDown Value="{Binding EndValue}" FormatString="0" />
+            
+            <TextBlock Text="Крок:" />
+            <NumericUpDown Value="{Binding StepValue}" FormatString="0" />
+            
+            <Button Content="Створити кнопки" 
+                    Command="{Binding GenerateButtonsCommand}" 
+                    HorizontalAlignment="Stretch" 
+                    HorizontalContentAlignment="Center"
+                    Background="LightGreen"/>
+
+            <Separator Margin="0, 10" />
+
+            <TextBlock Text="Керування видаленням" FontWeight="Bold" FontSize="16"/>
+            <TextBlock Text="Введіть число кратності:" />
+            <NumericUpDown Value="{Binding MultipleValue}" FormatString="0" />
+            
+            <Button Content="Видалити кратні кнопки" 
+                    Command="{Binding DeleteMultiplesCommand}" 
+                    HorizontalAlignment="Stretch" 
+                    HorizontalContentAlignment="Center"
+                    Background="LightCoral"/>
+
+            <!-- Вивід помилок (якщо користувач введе некоректні дані) -->
+            <TextBlock Text="{Binding ErrorMessage}" 
+                       Foreground="Red" 
+                       TextWrapping="Wrap" 
+                       Margin="0,10,0,0"
+                       IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+        </StackPanel>
+
+        <!-- Права панель з кнопками (Контейнер) -->
+        <Border Grid.Column="1" BorderBrush="Gray" BorderThickness="1" Margin="10">
+            <!-- ScrollViewer дозволяє скролити вміст, якщо кнопок забагато -->
+            <ScrollViewer>
+                <!-- ItemsControl - стандартний MVVM інструмент для виводу колекцій -->
+                <ItemsControl ItemsSource="{Binding GeneratedNumbers}" Margin="10">
+                    
+                    <!-- Розташовуємо кнопки за допомогою WrapPanel (перенесення на новий рядок) -->
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    
+                    <!-- Шаблон для кожної згенерованої кнопки -->
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <!-- Сама кнопка. Вона бере Value з класу NumberItem -->
+                            <Button Content="{Binding Value}" 
+                                    Width="50" Height="50" 
+                                    Margin="5"
+                                    HorizontalContentAlignment="Center"
+                                    VerticalContentAlignment="Center"
+                                    FontSize="16"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Border>
     </Grid>
 </UserControl>
