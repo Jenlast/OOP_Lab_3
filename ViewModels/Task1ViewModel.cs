@@ -1,3 +1,4 @@
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -17,30 +18,27 @@ namespace OOP_Lab3.ViewModels
         }
     }
 
-    // ЗМІНА ТУТ: Наслідуємось безпосередньо від ObservableObject
     public partial class Task1ViewModel : ViewModelBase
     {
-        // Властивості для полів вводу
         [ObservableProperty] private int _startValue = 1;
         [ObservableProperty] private int _endValue = 20;
         [ObservableProperty] private int _stepValue = 1;
-        
         [ObservableProperty] private int _multipleValue = 2;
-        
-        // Властивість для виводу помилок (Захист від дурня)
         [ObservableProperty] private string _errorMessage = string.Empty;
 
-        // Колекція, до якої буде прив'язаний інтерфейс
+        // НОВЕ: Властивість для відображення інформації про натиснуте число
+        [ObservableProperty] 
+        private string _numberInfo = "Натисніть на будь-яке число, щоб побачити інформацію.";
+
         public ObservableCollection<NumberItem> GeneratedNumbers { get; } = new ObservableCollection<NumberItem>();
 
-        // Команда для кнопки "Створити кнопки"
         [RelayCommand]
         private void GenerateButtons()
         {
             ErrorMessage = string.Empty;
+            NumberInfo = "Натисніть на будь-яке число, щоб побачити інформацію."; // Скидаємо інфо
             GeneratedNumbers.Clear();
 
-            // Валідація
             if (StepValue == 0)
             {
                 ErrorMessage = "Помилка: Крок не може бути 0!";
@@ -49,11 +47,10 @@ namespace OOP_Lab3.ViewModels
 
             if ((StartValue < EndValue && StepValue < 0) || (StartValue > EndValue && StepValue > 0))
             {
-                ErrorMessage = "Помилка: Нескінченний цикл (неправильний крок).";
+                ErrorMessage = "Помилка: Нескінченний цикл (неправильний крок для цього діапазону).";
                 return;
             }
 
-            // Генерація чисел
             if (StartValue <= EndValue)
             {
                 for (int i = StartValue; i <= EndValue; i += StepValue)
@@ -66,7 +63,6 @@ namespace OOP_Lab3.ViewModels
             }
         }
 
-        // Команда для кнопки "Видалити кратні"
         [RelayCommand]
         private void DeleteMultiples()
         {
@@ -78,13 +74,44 @@ namespace OOP_Lab3.ViewModels
                 return;
             }
 
-            // Знаходимо елементи, які треба видалити.
             var itemsToRemove = GeneratedNumbers.Where(x => x.Value % MultipleValue == 0).ToList();
-
             foreach (var item in itemsToRemove)
             {
                 GeneratedNumbers.Remove(item);
             }
+        }
+
+        // НОВЕ: Команда, яка спрацьовує при натисканні на згенеровану кнопку
+        [RelayCommand]
+        private void ShowNumberInfo(int number)
+        {
+            // Визначаємо знак
+            string sign = number > 0 ? "Додатнє" : (number < 0 ? "Від'ємне" : "Нуль");
+            
+            // Визначаємо простоту числа
+            string primeType = string.Empty;
+            
+            if (number <= 1)
+            {
+                // За правилами математики числа <= 1 не є ні простими, ні складними
+                primeType = "Не є ні простим, ні складним"; 
+            }
+            else
+            {
+                bool isPrime = true;
+                for (int i = 2; i <= Math.Sqrt(number); i++)
+                {
+                    if (number % i == 0)
+                    {
+                        isPrime = false;
+                        break;
+                    }
+                }
+                primeType = isPrime ? "Просте" : "Складне";
+            }
+
+            // Записуємо результат у властивість, яка прив'язана до інтерфейсу
+            NumberInfo = $"Число: {number}\nЗнак: {sign}\nТип: {primeType}";
         }
     }
 }

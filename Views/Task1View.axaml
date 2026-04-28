@@ -1,9 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:OOP_Lab3.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="OOP_Lab3.Views.Task1View"
              x:DataType="vm:Task1ViewModel">
 
@@ -19,14 +16,14 @@
             <TextBlock Text="Кінець:" />
             <NumericUpDown Value="{Binding EndValue}" FormatString="0" />
             
-            <TextBlock Text="Крок:" />
+            <TextBlock Text="Крок (може бути від'ємним):" />
             <NumericUpDown Value="{Binding StepValue}" FormatString="0" />
             
             <Button Content="Створити кнопки" 
                     Command="{Binding GenerateButtonsCommand}" 
                     HorizontalAlignment="Stretch" 
                     HorizontalContentAlignment="Center"
-                    Background="LightGreen"/>
+                    Background="Green"/>
 
             <Separator Margin="0, 10" />
 
@@ -38,36 +35,44 @@
                     Command="{Binding DeleteMultiplesCommand}" 
                     HorizontalAlignment="Stretch" 
                     HorizontalContentAlignment="Center"
-                    Background="LightCoral"/>
+                    Background="Coral"/>
 
-            <!-- Вивід помилок (якщо користувач введе некоректні дані) -->
             <TextBlock Text="{Binding ErrorMessage}" 
                        Foreground="Red" 
                        TextWrapping="Wrap" 
                        Margin="0,10,0,0"
                        IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+            
+            <Separator Margin="0, 10" />
+            
+            <!-- НОВЕ: Інформаційна панель -->
+            <Border Background="#007bffff" BorderBrush="#0066CC" BorderThickness="1" CornerRadius="5" Padding="10">
+                <StackPanel>
+                    <TextBlock Text="Інформація про число:" FontWeight="Bold" Margin="0,0,0,5"/>
+                    <TextBlock Text="{Binding NumberInfo}" TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
+            
         </StackPanel>
 
-        <!-- Права панель з кнопками (Контейнер) -->
+        <!-- Права панель з кнопками -->
         <Border Grid.Column="1" BorderBrush="Gray" BorderThickness="1" Margin="10">
-            <!-- ScrollViewer дозволяє скролити вміст, якщо кнопок забагато -->
             <ScrollViewer>
-                <!-- ItemsControl - стандартний MVVM інструмент для виводу колекцій -->
                 <ItemsControl ItemsSource="{Binding GeneratedNumbers}" Margin="10">
-                    
-                    <!-- Розташовуємо кнопки за допомогою WrapPanel (перенесення на новий рядок) -->
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel Orientation="Horizontal" />
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                     
-                    <!-- Шаблон для кожної згенерованої кнопки -->
                     <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <!-- Сама кнопка. Вона бере Value з класу NumberItem -->
+                        <!-- Вказуємо x:DataType, щоб компілятор знав, що ми працюємо з NumberItem -->
+                        <DataTemplate x:DataType="vm:NumberItem">
+                            <!-- Прив'язуємо команду з головного UserControl і передаємо Value як параметр -->
                             <Button Content="{Binding Value}" 
-                                    Width="50" Height="50" 
+                                    Command="{Binding $parent[UserControl].((vm:Task1ViewModel)DataContext).ShowNumberInfoCommand}"
+                                    CommandParameter="{Binding Value}"
+                                    Width="80" Height="50" 
                                     Margin="5"
                                     HorizontalContentAlignment="Center"
                                     VerticalContentAlignment="Center"
