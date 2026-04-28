@@ -12,6 +12,10 @@ namespace OOP_Lab3.ViewModels
         [ObservableProperty]
         private int _value;
 
+        // НОВЕ: Лічильник натискань для конкретної кнопки
+        [ObservableProperty]
+        private int _clickCount = 0;
+
         public NumberItem(int value)
         {
             Value = value;
@@ -26,7 +30,6 @@ namespace OOP_Lab3.ViewModels
         [ObservableProperty] private int _multipleValue = 2;
         [ObservableProperty] private string _errorMessage = string.Empty;
 
-        // НОВЕ: Властивість для відображення інформації про натиснуте число
         [ObservableProperty] 
         private string _numberInfo = "Натисніть на будь-яке число, щоб побачити інформацію.";
 
@@ -36,9 +39,9 @@ namespace OOP_Lab3.ViewModels
         private void GenerateButtons()
         {
             ErrorMessage = string.Empty;
-            NumberInfo = "Натисніть на будь-яке число, щоб побачити інформацію."; // Скидаємо інфо
-            GeneratedNumbers.Clear();
-
+            
+            // ПРИБРАНО: GeneratedNumbers.Clear(); - Тепер нові кнопки дописуються до старих!
+            
             if (StepValue == 0)
             {
                 ErrorMessage = "Помилка: Крок не може бути 0!";
@@ -81,21 +84,23 @@ namespace OOP_Lab3.ViewModels
             }
         }
 
-        // НОВЕ: Команда, яка спрацьовує при натисканні на згенеровану кнопку
+        // НОВЕ: Тепер ми приймаємо весь об'єкт NumberItem, а не просто число
         [RelayCommand]
-        private void ShowNumberInfo(int number)
+        private void ShowNumberInfo(NumberItem item)
         {
-            // Визначаємо знак
+            if (item == null) return;
+
+            // Збільшуємо лічильник кліків для цієї конкретної кнопки
+            item.ClickCount++;
+
+            int number = item.Value;
+
+            // Математика: визначаємо знак
             string sign = number > 0 ? "Додатнє" : (number < 0 ? "Від'ємне" : "Нуль");
             
-            // Визначаємо простоту числа
+            // Математика: визначаємо простоту
             string primeType = string.Empty;
-            
-            if (number <= 1)
-            {
-                // За правилами математики числа <= 1 не є ні простими, ні складними
-                primeType = "Не є ні простим, ні складним"; 
-            }
+            if (number <= 1) primeType = "Не є ні простим, ні складним"; 
             else
             {
                 bool isPrime = true;
@@ -110,8 +115,27 @@ namespace OOP_Lab3.ViewModels
                 primeType = isPrime ? "Просте" : "Складне";
             }
 
-            // Записуємо результат у властивість, яка прив'язана до інтерфейсу
-            NumberInfo = $"Число: {number}\nЗнак: {sign}\nТип: {primeType}";
+            // Формуємо базову відповідь
+            string mathAnswer = $"Число: {number}\nЗнак: {sign}\nТип: {primeType}";
+
+            // ПЕРЕВІРКА НА "ПАСХАЛКУ" (якщо натиснули 4 або більше разів)
+            if (item.ClickCount >= 4)
+            {
+                NumberInfo = $"😠 ДОСИТЬ ВЖЕ НАТИСКАТИ!\nТи натиснув на цю кнопку {item.ClickCount} разів!\nОсь твоя відповідь, тільки відчепися:\n\n{mathAnswer}";
+            }
+            else
+            {
+                NumberInfo = mathAnswer;
+            }
+        }
+        
+        // БОНУС: Кнопка, щоб все ж таки мати можливість очистити екран
+        [RelayCommand]
+        private void ClearAll()
+        {
+            GeneratedNumbers.Clear();
+            NumberInfo = "Екран очищено.";
+            ErrorMessage = string.Empty;
         }
     }
 }
