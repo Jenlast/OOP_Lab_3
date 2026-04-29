@@ -15,7 +15,7 @@ namespace OOP_Lab3.ViewModels
 
         private double _buttonX;
         private double _buttonY;
-        private string _questionText = "Ви поставите нам 20 балів за цю лабу?";
+        private string _questionText = "Ви поставите нам 10 балів за цю лабу?";
         
         private string _movingButtonText = "Ні";
         private string _movingButtonColor = "DarkRed";
@@ -115,7 +115,7 @@ namespace OOP_Lab3.ViewModels
             _isEvasive = true;
             _timeLeft = 10;
 
-            QuestionText = "Ви поставите нам 20 балів за цю лабу?";
+            QuestionText = "Ви поставите нам 10 балів за цю лабу?";
             MovingButtonText = "Ні";
             MovingButtonColor = "DarkRed";
             TimerText = "";
@@ -141,12 +141,16 @@ namespace OOP_Lab3.ViewModels
 
         private void ExecuteYesAction()
         {
-            QuestionText = "Дякуємо за 20 балів! Ви молодець!";
+            QuestionText = "Дякуємо за 10 балів! Ви молодець!";
             _timer.Stop(); 
             TimerText = ""; 
             
             // Приховуємо кнопки після згоди
             AreButtonsVisible = false;
+
+            // ЗУПИНЯЄМО логіку ухилення і скидаємо стан таймера
+            _isEvasive = false;
+            _isTimerStarted = false;
         }
 
         private void OnTimerTick(object? sender, EventArgs e)
@@ -174,6 +178,10 @@ namespace OOP_Lab3.ViewModels
         public void HandlePointerMoved(double mouseX, double mouseY, double areaWidth, double areaHeight)
         {
             if (areaWidth <= 0 || areaHeight <= 0) return;
+            
+            // Якщо кнопки приховані, ігноруємо рух миші
+            if (!AreButtonsVisible) return; 
+
             if (!_isEvasive) return;
 
             var (newX, newY) = _evasionStrategy.CalculateNewPosition(

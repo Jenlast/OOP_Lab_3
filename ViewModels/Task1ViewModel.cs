@@ -6,13 +6,11 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace OOP_Lab3.ViewModels
 {
-    // Модель для нашої згенерованої кнопки
     public partial class NumberItem : ObservableObject
     {
         [ObservableProperty]
         private int _value;
 
-        // НОВЕ: Лічильник натискань для конкретної кнопки
         [ObservableProperty]
         private int _clickCount = 0;
 
@@ -24,6 +22,9 @@ namespace OOP_Lab3.ViewModels
 
     public partial class Task1ViewModel : ViewModelBase
     {
+        // НОВЕ: Константа ліміту кнопок
+        private const int MaxButtonsLimit = 20000;
+
         [ObservableProperty] private int _startValue = 1;
         [ObservableProperty] private int _endValue = 20;
         [ObservableProperty] private int _stepValue = 1;
@@ -40,11 +41,22 @@ namespace OOP_Lab3.ViewModels
         {
             ErrorMessage = string.Empty;
             
-            // ПРИБРАНО: GeneratedNumbers.Clear(); - Тепер нові кнопки дописуються до старих!
-            
+            // Перевірка: чи не досягнуто ліміт ще ДО початку генерації
+            if (GeneratedNumbers.Count >= MaxButtonsLimit)
+            {
+                ErrorMessage = $"Помилка: Досягнуто максимальний ліміт кнопок ({MaxButtonsLimit}). Очистіть екран.";
+                return;
+            }
+
             if (StepValue == 0)
             {
                 ErrorMessage = "Помилка: Крок не може бути 0!";
+                return;
+            }
+
+            if (StartValue == EndValue)
+            {
+                ErrorMessage = "Помилка: Початкове і кінцеве значення не можуть бути однаковими.";
                 return;
             }
 
@@ -54,15 +66,42 @@ namespace OOP_Lab3.ViewModels
                 return;
             }
 
+            bool limitReached = false;
+            int currentCount = GeneratedNumbers.Count; // Кешуємо поточну кількість для швидкодії
+
             if (StartValue <= EndValue)
             {
                 for (int i = StartValue; i <= EndValue; i += StepValue)
+                {
+                    // НОВЕ: Перевірка ліміту під час додавання
+                    if (currentCount >= MaxButtonsLimit)
+                    {
+                        limitReached = true;
+                        break; // Зупиняємо цикл
+                    }
                     GeneratedNumbers.Add(new NumberItem(i));
+                    currentCount++;
+                }
             }
             else
             {
                 for (int i = StartValue; i >= EndValue; i += StepValue)
+                {
+                    // НОВЕ: Перевірка ліміту під час додавання
+                    if (currentCount >= MaxButtonsLimit)
+                    {
+                        limitReached = true;
+                        break; // Зупиняємо цикл
+                    }
                     GeneratedNumbers.Add(new NumberItem(i));
+                    currentCount++;
+                }
+            }
+
+            // Якщо ми зупинилися через ліміт, повідомляємо про це
+            if (limitReached)
+            {
+                ErrorMessage = $"Увага: Згенеровано лише частину чисел. Досягнуто ліміт у {MaxButtonsLimit} кнопок!";
             }
         }
 
@@ -84,21 +123,16 @@ namespace OOP_Lab3.ViewModels
             }
         }
 
-        // НОВЕ: Тепер ми приймаємо весь об'єкт NumberItem, а не просто число
         [RelayCommand]
         private void ShowNumberInfo(NumberItem item)
         {
             if (item == null) return;
 
-            // Збільшуємо лічильник кліків для цієї конкретної кнопки
             item.ClickCount++;
-
             int number = item.Value;
 
-            // Математика: визначаємо знак
             string sign = number > 0 ? "Додатнє" : (number < 0 ? "Від'ємне" : "Нуль");
             
-            // Математика: визначаємо простоту
             string primeType = string.Empty;
             if (number <= 1) primeType = "Не є ні простим, ні складним"; 
             else
@@ -115,10 +149,8 @@ namespace OOP_Lab3.ViewModels
                 primeType = isPrime ? "Просте" : "Складне";
             }
 
-            // Формуємо базову відповідь
             string mathAnswer = $"Число: {number}\nЗнак: {sign}\nТип: {primeType}";
 
-            // ПЕРЕВІРКА НА "ПАСХАЛКУ" (якщо натиснули 4 або більше разів)
             if (item.ClickCount >= 4)
             {
                 NumberInfo = $"😠 ДОСИТЬ ВЖЕ НАТИСКАТИ!\nТи натиснув на цю кнопку {item.ClickCount} разів!\nОсь твоя відповідь, тільки відчепися:\n\n{mathAnswer}";
@@ -129,7 +161,6 @@ namespace OOP_Lab3.ViewModels
             }
         }
         
-        // БОНУС: Кнопка, щоб все ж таки мати можливість очистити екран
         [RelayCommand]
         private void ClearAll()
         {
