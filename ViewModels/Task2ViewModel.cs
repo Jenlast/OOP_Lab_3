@@ -10,7 +10,6 @@ namespace OOP_Lab3.ViewModels
         private readonly IEvasionStrategy _evasionStrategy;
         private DispatcherTimer _timer;
         
-        // Початкові координати тепер не жорсткі, а задаються динамічно з UI
         private double _startX;
         private double _startY;
 
@@ -24,7 +23,10 @@ namespace OOP_Lab3.ViewModels
         private bool _isTimerStarted = false;
 
         private int _timeLeft = 10;
-        private string _timerText = ""; // Порожній текст, поки таймер не запущено
+        private string _timerText = ""; 
+        
+        // Нова властивість для керування видимістю кнопок
+        private bool _areButtonsVisible = true;
 
         public double ButtonX
         {
@@ -56,15 +58,22 @@ namespace OOP_Lab3.ViewModels
             set { _movingButtonColor = value; OnPropertyChanged(); }
         }
 
-        // Властивість, яку бачить XAML
         public string TimerText
         {
             get => _timerText;
             set { _timerText = value; OnPropertyChanged(); }
         }
 
+        // Властивість для Binding в XAML
+        public bool AreButtonsVisible
+        {
+            get => _areButtonsVisible;
+            set { _areButtonsVisible = value; OnPropertyChanged(); }
+        }
+
         public ICommand SayYesCommand { get; }
         public ICommand MovingButtonCommand { get; }
+        public ICommand ResetCommand { get; } 
 
         public Task2ViewModel(IEvasionStrategy evasionStrategy)
         {
@@ -77,6 +86,7 @@ namespace OOP_Lab3.ViewModels
             _timer.Tick += OnTimerTick;
 
             SayYesCommand = new RelayCommand(ExecuteYesAction);
+            ResetCommand = new RelayCommand(ResetState);
 
             MovingButtonCommand = new RelayCommand(() => 
             {
@@ -88,23 +98,40 @@ namespace OOP_Lab3.ViewModels
                 {
                     _timer.Stop();
                     _isEvasive = false;
-                    TimerText = ""; // Приховуємо таймер
+                    TimerText = ""; 
                     QuestionText = "А може все-таки поставите?";
                     MovingButtonText = "Так";
                     MovingButtonColor = "#333333";
-                    ButtonX = _startX; // Повертаємо на початкову позицію
+                    ButtonX = _startX; 
                     ButtonY = _startY;
                 }
             });
         }
 
-        // Цей метод викликається з UI, щоб повідомити ідеально рівні координати
+        private void ResetState()
+        {
+            _timer.Stop();
+            _isTimerStarted = false;
+            _isEvasive = true;
+            _timeLeft = 10;
+
+            QuestionText = "Ви поставите нам 20 балів за цю лабу?";
+            MovingButtonText = "Ні";
+            MovingButtonColor = "DarkRed";
+            TimerText = "";
+            
+            // Повертаємо видимість кнопкам
+            AreButtonsVisible = true;
+
+            ButtonX = _startX;
+            ButtonY = _startY;
+        }
+
         public void SetStartPosition(double x, double y)
         {
             _startX = x;
             _startY = y;
 
-            // Якщо ми ще не почали гратися або вже закінчили - оновлюємо позицію кнопки
             if (!_isTimerStarted || !_isEvasive)
             {
                 ButtonX = x;
@@ -116,27 +143,26 @@ namespace OOP_Lab3.ViewModels
         {
             QuestionText = "Дякуємо за 20 балів! Ви молодець!";
             _timer.Stop(); 
-            TimerText = ""; // Приховуємо таймер, якщо відповіли "Так"
+            TimerText = ""; 
+            
+            // Приховуємо кнопки після згоди
+            AreButtonsVisible = false;
         }
 
         private void OnTimerTick(object? sender, EventArgs e)
         {
-            _timeLeft--; // Віднімаємо 1 секунду
+            _timeLeft--; 
 
             if (_timeLeft > 0)
             {
-                // Оновлюємо текст на екрані
                 TimerText = $"Кнопка здасться через: {_timeLeft} сек";
             }
             else
             {
-                // Час вийшов!
                 _timer.Stop();
-                TimerText = ""; // Ховаємо таймер
-                
+                TimerText = ""; 
                 _isEvasive = false; 
                 
-                // Повертаємо рівно на місце "DummyPanel"
                 ButtonX = _startX;
                 ButtonY = _startY;
                 
@@ -158,8 +184,8 @@ namespace OOP_Lab3.ViewModels
                 if (!_isTimerStarted)
                 {
                     _isTimerStarted = true;
-                    _timeLeft = 10; // Скидаємо час на 10
-                    TimerText = $"Кнопка здасться через: {_timeLeft} сек"; // Показуємо відразу 10
+                    _timeLeft = 10; 
+                    TimerText = $"Кнопка здасться через: {_timeLeft} сек"; 
                     _timer.Start();
                 }
 

@@ -7,6 +7,18 @@
              Background="Transparent">
     
     <Grid Name="GameArea">
+        
+        <!-- КНОПКА СКИНУТИ -->
+        <Button Content="Reset" 
+                Command="{Binding ResetCommand}"
+                HorizontalAlignment="Right" 
+                VerticalAlignment="Top" 
+                Margin="15"
+                ZIndex="10"
+                Width="80" Height="35"
+                HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                Background="#555555" Foreground="White" />
+
         <!-- СТАТИЧНИЙ ШАР -->
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="20">
             
@@ -16,9 +28,16 @@
                        HorizontalAlignment="Center" MinHeight="25"/>
             
             <StackPanel Orientation="Horizontal" Spacing="50" HorizontalAlignment="Center">
-                <Button Content="Так" Width="100" Height="40" 
-                        HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-                        Command="{Binding SayYesCommand}" />
+                
+                <!-- ОБГОРТКА ДЛЯ КНОПКИ ТАК -->
+                <!-- Ми обгортаємо кнопку в Panel, щоб при її приховуванні макет не з'їжджав -->
+                <Panel Width="100" Height="40">
+                    <Button Content="Так" 
+                            IsVisible="{Binding AreButtonsVisible}"
+                            Width="100" Height="40" 
+                            HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                            Command="{Binding SayYesCommand}" />
+                </Panel>
                 
                 <!-- МАЯЧОК ДЛЯ КНОПКИ 'НІ' -->
                 <Panel Name="DummyPanel" Width="100" Height="40"/>
@@ -28,6 +47,7 @@
         <!-- ДИНАМІЧНИЙ ШАР (Canvas) -->
         <Canvas>
             <Button Content="{Binding MovingButtonText}" 
+                    IsVisible="{Binding AreButtonsVisible}"
                     Canvas.Left="{Binding ButtonX}" 
                     Canvas.Top="{Binding ButtonY}" 
                     Width="100" Height="40"
